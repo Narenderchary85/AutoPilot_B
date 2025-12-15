@@ -14,7 +14,7 @@ class FindContactEmailInput(BaseModel):
 def find_contact_email(name: str):
     "Get a contact's email and phone number from Google Contacts"
     try:
-        creds = get_contacts_credentials()  # <-- use the new contacts creds
+        creds = get_contacts_credentials() 
         service = build('people', 'v1', credentials=creds)
 
         results = service.people().searchContacts(

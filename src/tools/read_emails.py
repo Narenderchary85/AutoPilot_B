@@ -29,7 +29,6 @@ def read_emails(from_date: str, to_date: str, email: Optional[str] = None):
         from_ts = int(datetime.fromisoformat(from_date).timestamp())
         to_ts = int(datetime.fromisoformat(to_date).timestamp())
 
-        # 🔥 Unread + time range
         query = f"is:unread after:{from_ts} before:{to_ts}"
         if email:
             query += f" from:{email}"
