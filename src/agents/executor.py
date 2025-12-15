@@ -48,17 +48,12 @@ def parse_date_time(date_str: str, time_str: str):
     return local_dt.astimezone().isoformat()
 
 
-# -----------------------
-# Executor
-# -----------------------
+
 def execute_action(reply):
     """
     Accepts LLM output as dict OR JSON string and executes the action.
     """
 
-    # -----------------------
-    # 1. Robust JSON handling
-    # -----------------------
     if isinstance(reply, dict):
         data = reply
     else:
@@ -74,9 +69,6 @@ def execute_action(reply):
                     "raw": reply
                 }
 
-    # -----------------------
-    # 2. Extract action
-    # -----------------------
     action = data.get("action")
     payload = data.get("data") or data.get("parameters") or {}
 
@@ -86,9 +78,6 @@ def execute_action(reply):
             "raw": data
         }
 
-    # =====================================================
-    # 3. CREATE CALENDAR EVENT (UNCHANGED)
-    # =====================================================
     if action == "create_schedule":
         title = payload.get("title", "Untitled Event")
         description = payload.get("description", "")
@@ -108,9 +97,6 @@ def execute_action(reply):
             "details": result
         }
 
-    # =====================================================
-    # 4. LIST CALENDAR EVENTS
-    # =====================================================
     elif action == "list_events":
         start = payload.get("start_date")
         end = payload.get("end_date")
@@ -122,9 +108,7 @@ def execute_action(reply):
             "events": events
         }
 
-    # =====================================================
-    # 5. SEND EMAIL
-    # =====================================================
+
     elif action == "send_email":
         recipients = payload.get("to", [])
         subject = payload.get("subject", "No Subject")
@@ -150,9 +134,7 @@ def execute_action(reply):
             "results": results
         }
 
-    # =====================================================
-    # 6. READ EMAILS
-    # =====================================================
+
     elif action == "read_emails":
         result = read_emails.invoke({
             "from_date": payload.get("from_date"),
@@ -165,9 +147,7 @@ def execute_action(reply):
             "emails": result
         }
 
-    # =====================================================
-    # 7. SUMMARIZE EMAILS
-    # =====================================================
+
     elif action == "summarize_emails":
         count = payload.get("count", 5)
 
@@ -192,10 +172,7 @@ def execute_action(reply):
             "count": min(count, len(emails)),
             "summary": emails[:count]
         }
-    
-    # =====================================================
-    # 8. SEARCH WEB
-    # =====================================================
+
     elif action == "search_web":
         query = payload.get("query")
         result = search_web.invoke({"query": query})
@@ -206,9 +183,7 @@ def execute_action(reply):
             "results": result
         }
 
-    # =====================================================
-    # 9. SCRAPE WEBSITE
-    # =====================================================
+
     elif action == "scrape_website":
         url = payload.get("url")
         result = scrape_website_to_markdown.invoke({"url": url})
