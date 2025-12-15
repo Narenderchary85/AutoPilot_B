@@ -5,6 +5,7 @@ from src.agents.calendar_agent import CalendarAgent
 from src.agents.researcher_agent import ResearcherAgent
 from src.agents.contact_agent import ContactsAgent
 from src.agents.executor import execute_action
+from src.agents.google_news_agent import GoogleNewsAgent
 import json
 
 MANAGER_PROMPT = """
@@ -12,7 +13,7 @@ You are a router.
 
 You MUST output only JSON:
 {{
-  "agent": "<email_agent | calendar_agent | researcher_agen | none>",
+  "agent": "<email_agent | calendar_agent | researcher_agent | none>",
   "message": "<same user message>"
 }}
 
@@ -20,7 +21,8 @@ Rules:
 - If the user wants to schedule something, create an event,get events, or set a reminder → agent = "calendar_agent"
 - If the user wants to send, read, check, summarize, reply to, or draft emails → agent = "email_agent"
 - If the user wants to find a contact email, phone number, or search contacts → agent = "contacts_agent"
-- If the user wants to search, research, scrape websites, find LinkedIn profiles, get news → researcher_agent
+- If the user wants to search, research, scrape websites, find LinkedIn profiles, get news → agent= "researcher_agent"
+- If the user wants latest news, Google News, news articles, trending topics → agent = "google_news_agent"
 - Otherwise → agent = "none"
 
 Do NOT explain anything. Do NOT add text. Only return valid JSON.
@@ -39,6 +41,7 @@ class PersonalAssistant:
         self.calendar_agent = CalendarAgent()
         self.researcher_agent = ResearcherAgent()
         self.contact_agent = ContactsAgent()
+        self.google_news_agent = GoogleNewsAgent()
 
     def try_execute_action(self, reply_text):
         """
@@ -103,6 +106,10 @@ class PersonalAssistant:
             reply = self.contact_agent.invoke(user_message)
             return self.try_execute_action(reply)
 
+        if agent == "google_news_agent":
+            # Ask the agent to get the JSON action
+            reply = self.google_news_agent.invoke(user_message)
+            return self.try_execute_action(reply)
 
 
         # No agent needed

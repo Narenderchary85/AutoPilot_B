@@ -7,10 +7,13 @@ from src.tools.read_emails import read_emails
 from src.tools.search_web import search_web
 from src.tools.scrape_website import scrape_website_to_markdown
 from src.tools.find_contact_email import find_contact_email
+from src.agents.google_news_agent import GoogleNewsAgent
+from src.tools.news_agent import summarize_news
 
 # -----------------------
-# Helper: Date + Time → ISO
+# Helper: Date + Time → IS
 # -----------------------
+
 def parse_date_time(date_str: str, time_str: str):
     """
     date_str: 'today' | 'tomorrow' | '2025-12-12'
@@ -223,6 +226,27 @@ def execute_action(reply):
             "status": "success",
             "action": "find_contact_email",
             "result": result
+        }
+    
+    elif action == "fetch_news":
+        # Directly define query and max_results without invoking the agent recursively
+        query = "Artificial Intelligence"
+        max_results = 10
+
+        # Initialize your news agent
+        news_agent = GoogleNewsAgent()
+
+        # Fetch articles directly
+        articles = news_agent.fetch_news(query, max_results)
+
+        # Summarize the fetched news
+        summary = summarize_news(articles, max_points=7)
+
+        return {
+            "status": "news_fetched_summarized",
+            "query": query,
+            "summary": summary,
+            "articles": articles
         }
 
 
