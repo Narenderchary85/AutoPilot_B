@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+langchain
+langgraph
+python-dotenv
+pydantic
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+sqlite3-binary
+requests
