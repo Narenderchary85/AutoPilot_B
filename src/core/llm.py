@@ -10,7 +10,7 @@ class PerplexityLLM:
 
     def __init__(self):
         if not PPLX_API_KEY:
-            raise ValueError("❌ PPLX_API_KEY missing in environment variables")
+            raise ValueError("PPLX_API_KEY missing in environment variables")
 
         self.api_key = PPLX_API_KEY
         self.url = "https://api.perplexity.ai/chat/completions"

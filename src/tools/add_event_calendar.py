@@ -31,13 +31,10 @@ def add_event_to_calendar(
     """
 
     try:
-        # 🔐 Get OAuth credentials
         creds = get_calendar_credentials()
 
-        # 📅 Build Calendar service
         service = build("calendar", "v3", credentials=creds)
 
-        # ⏰ Parse ISO datetime
         event_start = datetime.fromisoformat(start_time)
 
         event = {

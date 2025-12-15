@@ -33,10 +33,8 @@ class PersonalAssistant:
     def __init__(self):
         llm = PerplexityLLM()
 
-        # Router agent
         self.agent = Agent(llm, MANAGER_PROMPT)
 
-        # Action agents
         self.email_agent = EmailAgent()
         self.calendar_agent = CalendarAgent()
         self.researcher_agent = ResearcherAgent()

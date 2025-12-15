@@ -3,7 +3,6 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import os
 
-# ---------------- CALENDAR ----------------
 CALENDAR_SCOPES = [
     "https://www.googleapis.com/auth/calendar"
 ]
@@ -35,7 +34,6 @@ def get_calendar_credentials():
     return creds
 
 
-# ---------------- GMAIL ----------------
 GMAIL_SCOPES = [
     "https://www.googleapis.com/auth/gmail.send",
      "https://www.googleapis.com/auth/gmail.readonly",

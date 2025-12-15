@@ -17,4 +17,4 @@ def summarize_news(articles, max_points=7):
     """
     
     response = llm.invoke(prompt)
-    return response  # LLM returns text summary
+    return response  
