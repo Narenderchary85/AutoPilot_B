@@ -4,7 +4,9 @@ from src.tools.add_event_calendar import add_event_to_calendar
 from src.tools.get_calendar_events import get_calendar_events
 from src.tools.send_email import send_email
 from src.tools.read_emails import read_emails
-
+from src.tools.search_web import search_web
+from src.tools.scrape_website import scrape_website_to_markdown
+from src.tools.find_contact_email import find_contact_email
 
 # -----------------------
 # Helper: Date + Time → ISO
@@ -176,11 +178,53 @@ def execute_action(reply):
             "email": None
         })
 
+        if isinstance(emails, dict) and "error" in emails:
+            return {
+                "status": "emails_summary",
+                "error": emails["error"]
+            }
+
         return {
             "status": "emails_summary",
-            "count": count,
+            "count": min(count, len(emails)),
             "summary": emails[:count]
         }
+    
+    # =====================================================
+    # 8. SEARCH WEB
+    # =====================================================
+    elif action == "search_web":
+        query = payload.get("query")
+        result = search_web.invoke({"query": query})
+
+        return {
+            "status": "web_search",
+            "query": query,
+            "results": result
+        }
+
+    # =====================================================
+    # 9. SCRAPE WEBSITE
+    # =====================================================
+    elif action == "scrape_website":
+        url = payload.get("url")
+        result = scrape_website_to_markdown.invoke({"url": url})
+
+        return {
+            "status": "website_scraped",
+            "url": url,
+            "content": result
+        }
+    
+    elif action == "find_contact_email":
+        name = payload.get("name")
+        result = find_contact_email(name)
+        return {
+            "status": "success",
+            "action": "find_contact_email",
+            "result": result
+        }
+
 
     # -----------------------
     # Unknown action

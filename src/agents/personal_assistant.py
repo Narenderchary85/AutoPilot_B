@@ -2,6 +2,8 @@ from src.core.llm import PerplexityLLM
 from src.agents.base import Agent
 from src.agents.email_agent import EmailAgent
 from src.agents.calendar_agent import CalendarAgent
+from src.agents.researcher_agent import ResearcherAgent
+from src.agents.contact_agent import ContactsAgent
 from src.agents.executor import execute_action
 import json
 
@@ -10,13 +12,15 @@ You are a router.
 
 You MUST output only JSON:
 {{
-  "agent": "<email_agent | calendar_agent | none>",
+  "agent": "<email_agent | calendar_agent | researcher_agen | none>",
   "message": "<same user message>"
 }}
 
 Rules:
-- If the user wants to schedule something, create an event, or set a reminder → agent = "calendar_agent"
-- If the user wants to send an email, reply to an email, draft an email → agent = "email_agent"
+- If the user wants to schedule something, create an event,get events, or set a reminder → agent = "calendar_agent"
+- If the user wants to send, read, check, summarize, reply to, or draft emails → agent = "email_agent"
+- If the user wants to find a contact email, phone number, or search contacts → agent = "contacts_agent"
+- If the user wants to search, research, scrape websites, find LinkedIn profiles, get news → researcher_agent
 - Otherwise → agent = "none"
 
 Do NOT explain anything. Do NOT add text. Only return valid JSON.
@@ -33,6 +37,8 @@ class PersonalAssistant:
         # Action agents
         self.email_agent = EmailAgent()
         self.calendar_agent = CalendarAgent()
+        self.researcher_agent = ResearcherAgent()
+        self.contact_agent = ContactsAgent()
 
     def try_execute_action(self, reply_text):
         """
@@ -88,6 +94,16 @@ class PersonalAssistant:
         if agent == "email_agent":
             reply = self.email_agent.invoke(user_message)
             return self.try_execute_action(reply)
+        
+        if agent == "researcher_agent":
+            reply = self.researcher_agent.invoke(user_message)
+            return self.try_execute_action(reply)
+        
+        if agent == "contacts_agent":
+            reply = self.contact_agent.invoke(user_message)
+            return self.try_execute_action(reply)
+
+
 
         # No agent needed
         return {

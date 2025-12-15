@@ -37,7 +37,8 @@ def get_calendar_credentials():
 
 # ---------------- GMAIL ----------------
 GMAIL_SCOPES = [
-    "https://www.googleapis.com/auth/gmail.send"
+    "https://www.googleapis.com/auth/gmail.send",
+     "https://www.googleapis.com/auth/gmail.readonly",
 ]
 GMAIL_TOKEN = "token_gmail.json"
 
@@ -62,6 +63,36 @@ def get_gmail_credentials():
             creds = flow.run_local_server(port=0)
 
         with open(GMAIL_TOKEN, "w") as token:
+            token.write(creds.to_json())
+
+    return creds
+
+CONTACTS_SCOPES = [
+    "https://www.googleapis.com/auth/contacts.readonly"
+]
+CONTACTS_TOKEN = "token_contacts.json"
+
+
+def get_contacts_credentials():
+    creds = None
+
+    if os.path.exists(CONTACTS_TOKEN):
+        creds = Credentials.from_authorized_user_file(
+            CONTACTS_TOKEN,
+            CONTACTS_SCOPES
+        )
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "credentials.json",  # Your OAuth client secrets
+                CONTACTS_SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+
+        with open(CONTACTS_TOKEN, "w") as token:
             token.write(creds.to_json())
 
     return creds
