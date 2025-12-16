@@ -5,6 +5,8 @@ from src.db.mongo import google_tokens_collection
 from src.auth.dependencies import get_current_user
 from src.models.google_token import GoogleTokenCreate
 from datetime import datetime
+import os
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 router = APIRouter(prefix="/google", tags=["Google"])
 

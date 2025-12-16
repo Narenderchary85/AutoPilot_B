@@ -1,9 +1,7 @@
 from src.core.llm import PerplexityLLM
 
 def summarize_news(articles, max_points=7):
-    """
-    Summarize a list of articles into numbered key points.
-    """
+
     llm = PerplexityLLM()
 
     combined_text = "\n".join([f"{a['title']}: {a.get('snippet','')}" for a in articles])

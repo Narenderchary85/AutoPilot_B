@@ -18,9 +18,6 @@ class ReadEmailsInput(BaseModel):
 @tool("ReadEmails", args_schema=ReadEmailsInput)
 @traceable(run_type="tool", name="ReadEmails")
 def read_emails(from_date: str, to_date: str, email: Optional[str] = None):
-    """
-    Reads emails from Gmail inbox and returns structured email data.
-    """
 
     try:
         creds = get_gmail_credentials()
