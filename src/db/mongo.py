@@ -6,3 +6,5 @@ db = client.autopilot
 
 users_collection = db.users
 google_tokens_collection = db.google_tokens
+google_tokens_collection.create_index("user_id", unique=True)
+

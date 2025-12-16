@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from google_auth_oauthlib.flow import Flow
 from src.utils.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from src.db.mongo import google_tokens_collection
-import os
+from src.auth.dependencies import get_current_user
+from src.models.google_token import GoogleTokenCreate
+from datetime import datetime
 
 router = APIRouter(prefix="/google", tags=["Google"])
 
@@ -14,31 +16,59 @@ SCOPES = [
 ]
 
 @router.get("/connect")
-def connect_google():
+def connect_google(user_id: str = Depends(get_current_user)):
     flow = Flow.from_client_secrets_file(
         "credentials.json",
         scopes=SCOPES,
         redirect_uri="http://localhost:8000/google/callback"
     )
-    auth_url, _ = flow.authorization_url(prompt="consent")
+
+    auth_url, state = flow.authorization_url(
+        prompt="consent",
+        access_type="offline"
+    )
+
+    google_tokens_collection.update_one(
+        {"user_id": user_id},
+        {"$set": {"oauth_state": state}},
+        upsert=True
+    )
+
     return {"auth_url": auth_url}
 
 @router.get("/callback")
 def google_callback(request: Request):
+    state = request.query_params.get("state")
+
+    user_record = google_tokens_collection.find_one({"oauth_state": state})
+    if not user_record:
+        raise HTTPException(status_code=400, detail="Invalid OAuth state")
+
+    user_id = user_record["user_id"]
+
     flow = Flow.from_client_secrets_file(
         "credentials.json",
         scopes=SCOPES,
-        redirect_uri="http://localhost:8000/google/callback"
+        redirect_uri="http://localhost:8000/google/callback",
+        state=state
     )
 
     flow.fetch_token(authorization_response=str(request.url))
     creds = flow.credentials
 
-    google_tokens_collection.insert_one({
-        "access_token": creds.token,
-        "refresh_token": creds.refresh_token,
-        "scope": creds.scopes,
-        "expiry": creds.expiry
-    })
+    token_data = GoogleTokenCreate(
+        user_id=user_id,
+        access_token=creds.token,
+        refresh_token=creds.refresh_token,
+        scopes=creds.scopes,
+        expiry=creds.expiry,
+        oauth_state=None
+    )
+
+    google_tokens_collection.update_one(
+        {"user_id": user_id},
+        {"$set": token_data.dict()},
+        upsert=True
+    )
 
     return {"message": "Google account connected"}
