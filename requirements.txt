@@ -10,3 +10,5 @@ google-auth-oauthlib
 sqlite3-binary
 requests
 feedparser
+python-jose
+pydantic

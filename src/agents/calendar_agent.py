@@ -33,10 +33,8 @@ class CalendarAgent:
         self.agent = Agent(llm, CALENDAR_AGENT_PROMPT)
 
     def invoke(self, message: str):
-        # 1️⃣ Call LLM
         response = self.agent.invoke(message)
 
-        # 2️⃣ Extract ONLY the model content
         try:
             content = response["choices"][0]["message"]["content"]
         except Exception:
@@ -45,7 +43,6 @@ class CalendarAgent:
                 "raw": response
             }
 
-        # 3️⃣ Parse JSON
         try:
             data = json.loads(content)
         except Exception:
@@ -54,7 +51,6 @@ class CalendarAgent:
                 "raw": content
             }
 
-        # 4️⃣ Execute calendar action
         if "action" in data:
             return execute_action(content)
 
