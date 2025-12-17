@@ -34,7 +34,6 @@ class GoogleNewsAgent:
         """Fetch latest news articles from Google RSS."""
         rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
         feed = feedparser.parse(rss_url)
-
         articles = []
         for entry in feed.entries[:max_results]:
             articles.append({

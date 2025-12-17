@@ -46,7 +46,6 @@ Rules:
 User request:
 {input}
 """
-
 class EmailAgent:
     def __init__(self):
         llm = PerplexityLLM()

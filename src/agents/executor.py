@@ -180,7 +180,6 @@ def execute_action(reply):
             "results": result
         }
 
-
     elif action == "scrape_website":
         url = payload.get("url")
         result = scrape_website_to_markdown.invoke({"url": url})
