@@ -9,6 +9,7 @@ from src.tools.scrape_website import scrape_website_to_markdown
 from src.tools.find_contact_email import find_contact_email
 from src.agents.google_news_agent import GoogleNewsAgent
 from src.tools.news_agent import summarize_news
+from src.utils.presentation_builder import PresentationBuilder
 
 
 def parse_date_time(date_str: str, time_str: str):
@@ -44,7 +45,15 @@ def parse_date_time(date_str: str, time_str: str):
     local_dt = datetime.combine(day, dt_time)
     return local_dt.astimezone().isoformat()
 
-
+def parse_agent_response(llm_response: dict):
+    """
+    Extract ONLY the assistant JSON from the LLM response
+    """
+    try:
+        content = llm_response["choices"][0]["message"]["content"]
+        return json.loads(content)
+    except Exception as e:
+        raise ValueError(f"Invalid agent JSON: {e}")
 
 def execute_action(reply):
     """
@@ -142,9 +151,11 @@ def execute_action(reply):
             "email": payload.get("email")
         })
 
+        human_text = PresentationBuilder.build(result)
+
         return {
             "status": "emails_fetched",
-            "emails": result
+            "emails": human_text
         }
 
 
@@ -161,6 +172,8 @@ def execute_action(reply):
             "email": None
         })
 
+        human_text = PresentationBuilder.build(emails)
+
         if isinstance(emails, dict) and "error" in emails:
             return {
                 "status": "emails_summary",
@@ -170,7 +183,7 @@ def execute_action(reply):
         return {
             "status": "emails_summary",
             "count": min(count, len(emails)),
-            "summary": emails[:count]
+            "summary": human_text[:count]
         }
 
     elif action == "search_web":
@@ -204,25 +217,36 @@ def execute_action(reply):
         }
     
     elif action == "fetch_news":
-        # Directly define query and max_results without invoking the agent recursively
-        query = "Artificial Intelligence"
-        max_results = 10
 
-        # Initialize your news agent
-        news_agent = GoogleNewsAgent()
+            news_agent = GoogleNewsAgent()
+            print("new agent",news_agent)
+            # 1. Search news via Perplexity (RAW response)
+            llm_response = news_agent.search_news_with_llm(
+                payload["data"]["query"]
+            )
+            print("llm",llm_response)
+            # 2. Extract articles from search_results
+            articles = news_agent.extract_articles_from_search(
+                llm_response,
+                max_results=payload["data"].get("max_results", 7)
+            )
+            print("articles",articles)
+            if not articles:
+                return {
+                    "status": "error",
+                    "message": "No news found"
+                }
 
-        # Fetch articles directly
-        articles = news_agent.fetch_news(query, max_results)
+            # 3. Summarize
+            summary = summarize_news(articles, max_points=7)
+            print("summary",summary)
+            return {
+                "status": "success",
+                "query": payload["data"]["query"],
+                "summary": summary,
+                "articles": articles
+            }
 
-        # Summarize the fetched news
-        summary = summarize_news(articles, max_points=7)
-
-        return {
-            "status": "news_fetched_summarized",
-            "query": query,
-            "summary": summary,
-            "articles": articles
-        }
 
 
     # -----------------------
