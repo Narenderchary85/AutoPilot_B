@@ -4,9 +4,17 @@ from pydantic import BaseModel
 from src.agents.personal_assistant import PersonalAssistant
 from src.routers.auth import router as auth_router
 from src.routers.google_oauth import router as google_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 assistant = PersonalAssistant()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router)
 app.include_router(google_router)

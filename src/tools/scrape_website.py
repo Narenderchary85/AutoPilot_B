@@ -12,6 +12,10 @@ class ScrapeWebsiteInput(BaseModel):
 @tool("ScrapeWebsite", args_schema=ScrapeWebsiteInput)
 @traceable(run_type="tool", name="ScrapeWebsite")
 def scrape_website_to_markdown(url: str) -> str:
+    """
+    Fetch Google Calendar events between a start date and end date
+    for the authenticated user.
+    """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
         "Accept-Language": "en-US,en;q=0.5",

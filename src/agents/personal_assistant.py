@@ -18,7 +18,7 @@ You MUST output only JSON:
 }}
 
 Rules:
-- If the user wants to schedule something, create an event,get events, or set a reminder → agent = "calendar_agent"
+- If the user wants to schedule something, create an event,lists events, or set a reminder → agent = "calendar_agent"
 - If the user wants to send, read, check, summarize, reply to, or draft emails → agent = "email_agent"
 - If the user wants to find a contact email, phone number, or search contacts → agent = "contacts_agent"
 - If the user wants to search, research, scrape websites, find LinkedIn profiles, get news → agent= "researcher_agent"

@@ -18,7 +18,10 @@ class ReadEmailsInput(BaseModel):
 @tool("ReadEmails", args_schema=ReadEmailsInput)
 @traceable(run_type="tool", name="ReadEmails")
 def read_emails(from_date: str, to_date: str, email: Optional[str] = None):
-
+    """
+    Fetch Google Calendar events between a start date and end date
+    for the authenticated user.
+    """
     try:
         creds = get_gmail_credentials()
         service = build("gmail", "v1", credentials=creds)

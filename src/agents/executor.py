@@ -95,13 +95,16 @@ def execute_action(reply):
         }
 
     elif action == "list_events":
-        start = payload.get("start_date")
-        end = payload.get("end_date")
+        start = action["start_date"]
+        end = action["end_date"]
 
-        events = get_calendar_events(start, end)
+        events = get_calendar_events.invoke({
+            "start_date": start,
+            "end_date": end
+        })
 
         return {
-            "status": "events_fetched",
+            "status": "calendar_events",
             "events": events
         }
 
