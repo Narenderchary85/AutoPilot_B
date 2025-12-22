@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from email.utils import parsedate_to_datetime
 from src.utils.google_auth import get_gmail_credentials
+from src.utils.google_user_auth import get_user_credentials
 
 
 class ReadEmailsInput(BaseModel):
@@ -17,10 +18,11 @@ class ReadEmailsInput(BaseModel):
 
 @tool("ReadEmails", args_schema=ReadEmailsInput)
 @traceable(run_type="tool", name="ReadEmails")
-def read_emails(from_date: str, to_date: str, email: Optional[str] = None):
-
+def read_emails(from_date: str, to_date: str, email: Optional[str] = None, user_id: str = str):
+    """ Read emails from Gmail within a date range, optionally filtered by sender email. """
     try:
-        creds = get_gmail_credentials()
+        #creds = get_gmail_credentials()
+        creds = get_user_credentials(user_id)
         service = build("gmail", "v1", credentials=creds)
 
         from_ts = int(datetime.fromisoformat(from_date).timestamp())

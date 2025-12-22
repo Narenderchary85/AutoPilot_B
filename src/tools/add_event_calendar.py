@@ -5,6 +5,7 @@ from langchain_core.tools import tool
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from src.utils.google_auth import get_calendar_credentials
+from src.utils.google_user_auth import get_user_credentials
 
 
 class AddEventToCalendarInput(BaseModel):
@@ -13,6 +14,7 @@ class AddEventToCalendarInput(BaseModel):
     start_time: str = Field(
         description="Start time of the event in ISO format (YYYY-MM-DDTHH:MM:SS±TZ)"
     )
+    user_id: str = Field(description="User ID for OAuth credentials")
 
 
 @tool(
@@ -23,16 +25,17 @@ class AddEventToCalendarInput(BaseModel):
 def add_event_to_calendar(
     title: str,
     description: str,
-    start_time: str
-):
+    start_time: str,
+    user_id: str
+    ):
     """
     Creates a Google Calendar event.
     This is a LangChain StructuredTool and MUST be called via `.invoke()`
     """
 
     try:
-        creds = get_calendar_credentials()
-
+        # creds = get_calendar_credentials()
+        creds = get_user_credentials(user_id)
         service = build("calendar", "v3", credentials=creds)
 
         event_start = datetime.fromisoformat(start_time)

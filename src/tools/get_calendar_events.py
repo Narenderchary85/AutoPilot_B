@@ -13,7 +13,7 @@ class GetCalendarEventsInput(BaseModel):
 @tool("GetCalendarEvents", args_schema=GetCalendarEventsInput)
 @traceable(run_type="tool", name="GetCalendarEvents")
 def get_calendar_events(start_date: str, end_date: str):
-
+    " Fetch calendar events between start_date and end_date from Google Calendar."
     try:
         creds = get_calendar_credentials()
         service = build("calendar", "v3", credentials=creds)

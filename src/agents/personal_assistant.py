@@ -41,7 +41,7 @@ class PersonalAssistant:
         self.contact_agent = ContactsAgent()
         self.google_news_agent = GoogleNewsAgent()
 
-    def try_execute_action(self, reply_text):
+    def try_execute_action(self, reply_text,user_id=str):
         """
         If the agent returns JSON with an action, execute it.
         Example expected:
@@ -53,18 +53,17 @@ class PersonalAssistant:
         try:
             data = json.loads(reply_text)
             if "action" in data:
-                return execute_action(data)
+                return execute_action(data,user_id=user_id)
         except Exception:
             pass  # Not JSON or no action
 
         return reply_text
 
-    def invoke(self, message):
+    def invoke(self, message, user_id: str):
         """
         Main routing function.
         Sends user message → router → finds agent → executes agent.
         """
-
         # Router call
         router_output = self.agent.invoke(message)
 
@@ -90,24 +89,24 @@ class PersonalAssistant:
         # Route based on agent
         if agent == "calendar_agent":
             reply = self.calendar_agent.invoke(user_message)
-            return self.try_execute_action(reply)
+            return self.try_execute_action(reply,user_id=user_id)
 
         if agent == "email_agent":
             reply = self.email_agent.invoke(user_message)
-            return self.try_execute_action(reply)
+            return self.try_execute_action(reply,user_id=user_id)
         
         if agent == "researcher_agent":
             reply = self.researcher_agent.invoke(user_message)
-            return self.try_execute_action(reply)
+            return self.try_execute_action(reply,user_id=user_id)
         
         if agent == "contacts_agent":
             reply = self.contact_agent.invoke(user_message)
-            return self.try_execute_action(reply)
+            return self.try_execute_action(reply,user_id=user_id)
 
         if agent == "google_news_agent":
             # Ask the agent to get the JSON action
             reply = self.google_news_agent.invoke(user_message)
-            return self.try_execute_action(reply)
+            return self.try_execute_action(reply,user_id=user_id)
 
 
         # No agent needed

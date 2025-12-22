@@ -46,11 +46,11 @@ def parse_date_time(date_str: str, time_str: str):
 
 
 
-def execute_action(reply):
+def execute_action(reply,user_id=str):
     """
     Accepts LLM output as dict OR JSON string and executes the action.
     """
-
+    print("user id in execute action:",user_id)
     if isinstance(reply, dict):
         data = reply
     else:
@@ -86,7 +86,8 @@ def execute_action(reply):
         result = add_event_to_calendar.invoke({
             "title": title,
             "description": description,
-            "start_time": start_iso
+            "start_time": start_iso,
+            "user_id": str(user_id)   
         })
 
         return {
@@ -113,13 +114,13 @@ def execute_action(reply):
 
         if isinstance(recipients, str):
             recipients = [recipients]
-
         results = []
         for recipient in recipients:
             result = send_email.invoke({
                 "to": recipient,
                 "subject": subject,
-                "body": body
+                "body": body,
+                "user_id": user_id
             })
             results.append({
                 "to": recipient,
@@ -136,7 +137,8 @@ def execute_action(reply):
         result = read_emails.invoke({
             "from_date": payload.get("from_date"),
             "to_date": payload.get("to_date"),
-            "email": payload.get("email")
+            "email": payload.get("email"),
+            "user_id": user_id
         })
 
         return {
@@ -155,7 +157,8 @@ def execute_action(reply):
         emails = read_emails.invoke({
             "from_date": from_date,
             "to_date": to_date,
-            "email": None
+            "email": None,
+            "user_id": user_id
         })
 
         if isinstance(emails, dict) and "error" in emails:
