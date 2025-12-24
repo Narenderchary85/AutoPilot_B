@@ -9,6 +9,7 @@ from src.tools.scrape_website import scrape_website_to_markdown
 from src.tools.find_contact_email import find_contact_email
 from src.agents.google_news_agent import GoogleNewsAgent
 from src.tools.news_agent import summarize_news
+from src.tools.summarize_email import summarize_emails
 
 
 def parse_date_time(date_str: str, time_str: str):
@@ -42,15 +43,15 @@ def parse_date_time(date_str: str, time_str: str):
                 dt_time = datetime.strptime(time_str.strip(), "%H:%M").time()
 
     local_dt = datetime.combine(day, dt_time)
+
     return local_dt.astimezone().isoformat()
 
 
 
-def execute_action(reply,user_id=str):
+def execute_action(reply,user_id:str):
     """
     Accepts LLM output as dict OR JSON string and executes the action.
     """
-    print("user id in execute action:",user_id)
     if isinstance(reply, dict):
         data = reply
     else:
@@ -82,12 +83,11 @@ def execute_action(reply,user_id=str):
         time = payload.get("time", "9:00 AM")
 
         start_iso = parse_date_time(date, time)
-
         result = add_event_to_calendar.invoke({
             "title": title,
             "description": description,
             "start_time": start_iso,
-            "user_id": str(user_id)   
+            "user_id": user_id   
         })
 
         return {
@@ -126,7 +126,7 @@ def execute_action(reply,user_id=str):
                 "to": recipient,
                 "result": result
             })
-
+        print("results:",results)
         return {
             "status": "emails_sent",
             "results": results
@@ -134,6 +134,7 @@ def execute_action(reply,user_id=str):
 
 
     elif action == "read_emails":
+        print('read emails action invoked')
         result = read_emails.invoke({
             "from_date": payload.get("from_date"),
             "to_date": payload.get("to_date"),
@@ -149,29 +150,22 @@ def execute_action(reply,user_id=str):
 
     elif action == "summarize_emails":
         count = payload.get("count", 5)
-
+        print('summarize emails action invoked')
         now = datetime.now()
         from_date = (now - timedelta(hours=24)).isoformat()
         to_date = now.isoformat()
-
-        emails = read_emails.invoke({
+        result = summarize_emails.invoke({
             "from_date": from_date,
             "to_date": to_date,
-            "email": None,
+            "count": count,
             "user_id": user_id
         })
 
-        if isinstance(emails, dict) and "error" in emails:
-            return {
-                "status": "emails_summary",
-                "error": emails["error"]
-            }
-
         return {
             "status": "emails_summary",
-            "count": min(count, len(emails)),
-            "summary": emails[:count]
+            "result": result
         }
+
 
     elif action == "search_web":
         query = payload.get("query")

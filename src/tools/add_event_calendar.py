@@ -34,6 +34,7 @@ def add_event_to_calendar(
     """
 
     try:
+        print("Getting user credentials for user_id:", user_id)
         # creds = get_calendar_credentials()
         creds = get_user_credentials(user_id)
         service = build("calendar", "v3", credentials=creds)

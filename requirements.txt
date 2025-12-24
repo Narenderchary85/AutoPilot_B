@@ -12,3 +12,5 @@ requests
 feedparser
 python-jose
 pydantic
+motor
+openpyxl

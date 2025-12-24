@@ -53,6 +53,7 @@ class PersonalAssistant:
         try:
             data = json.loads(reply_text)
             if "action" in data:
+                print("Executing action:", data["action"])
                 return execute_action(data,user_id=user_id)
         except Exception:
             pass  # Not JSON or no action
@@ -69,7 +70,7 @@ class PersonalAssistant:
 
         # Extract Perplexity text
         raw_text = router_output["choices"][0]["message"]["content"]
-
+        
         print("\n--- ROUTER RAW TEXT ---")
         print(raw_text)
         print("-----------------------\n")
@@ -92,6 +93,7 @@ class PersonalAssistant:
             return self.try_execute_action(reply,user_id=user_id)
 
         if agent == "email_agent":
+            print('inkove email agent')
             reply = self.email_agent.invoke(user_message)
             return self.try_execute_action(reply,user_id=user_id)
         

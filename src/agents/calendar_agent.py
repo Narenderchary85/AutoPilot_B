@@ -34,27 +34,4 @@ class CalendarAgent:
 
     def invoke(self, message: str):
         response = self.agent.invoke(message)
-
-        try:
-            content = response["choices"][0]["message"]["content"]
-        except Exception:
-            return {
-                "error": "Invalid LLM response format",
-                "raw": response
-            }
-
-        try:
-            data = json.loads(content)
-        except Exception:
-            return {
-                "error": "LLM did not return valid JSON",
-                "raw": content
-            }
-
-        if "action" in data:
-            return execute_action(content)
-
-        return {
-            "error": "No action found in response",
-            "raw": data
-        }
+        return response["choices"][0]["message"]["content"]

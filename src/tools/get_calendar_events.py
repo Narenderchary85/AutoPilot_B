@@ -5,6 +5,7 @@ from langchain_core.tools import tool
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from src.utils.google_auth import get_calendar_credentials
+from src.utils.google_user_auth import get_user_credentials
 
 class GetCalendarEventsInput(BaseModel):
     start_date: str = Field(description="Start date for fetching events")
@@ -12,10 +13,10 @@ class GetCalendarEventsInput(BaseModel):
 
 @tool("GetCalendarEvents", args_schema=GetCalendarEventsInput)
 @traceable(run_type="tool", name="GetCalendarEvents")
-def get_calendar_events(start_date: str, end_date: str):
+def get_calendar_events(start_date: str, end_date: str,user_id: str):
     " Fetch calendar events between start_date and end_date from Google Calendar."
     try:
-        creds = get_calendar_credentials()
+        creds = get_user_credentials(user_id)
         service = build("calendar", "v3", credentials=creds)
 
         start_datetime = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)

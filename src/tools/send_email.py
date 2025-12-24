@@ -19,16 +19,15 @@ def send_email(to, subject: str, body: str, user_id: str):
     """
     Send email using Gmail API (OAuth)
     """
-
     if isinstance(to, list):
         recipients = to
     else:
         recipients = [to]
-    print("user id in send email tool:",user_id)
+
     #creds = get_gmail_credentials()
     creds = get_user_credentials(user_id)
     service = build("gmail", "v1", credentials=creds)
-
+    print("Sending email to:", recipients)
     results = []
 
     for recipient in recipients:
