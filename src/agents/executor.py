@@ -5,7 +5,7 @@ from src.tools.get_calendar_events import get_calendar_events
 from src.tools.send_email import send_email
 from src.tools.read_emails import read_emails
 from src.tools.search_web import search_web
-from src.tools.scrape_website import scrape_website_to_markdown
+from src.tools.scrape_website import scrape_website
 from src.tools.find_contact_email import find_contact_email
 from src.agents.google_news_agent import GoogleNewsAgent
 from src.tools.news_agent import summarize_news
@@ -179,7 +179,7 @@ def execute_action(reply,user_id:str):
 
     elif action == "scrape_website":
         url = payload.get("url")
-        result = scrape_website_to_markdown.invoke({"url": url})
+        result = scrape_website(url)
 
         return {
             "status": "website_scraped",

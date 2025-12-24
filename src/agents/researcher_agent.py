@@ -4,22 +4,17 @@ from src.core.llm import PerplexityLLM
 RESEARCHER_AGENT_PROMPT = """
 You are a Researcher Agent.
 
-You MUST output only JSON.
+You can:
+- Answer questions directly using your knowledge and web search.
+- Optionally request tools ONLY when required.
 
-Possible actions:
-1. search_web
-2. scrape_website
-3. search_linkedin
+Rules:
+- If the user asks for general information, research, explanations, comparisons, specs → ANSWER DIRECTLY.
+- If the user provides a URL or explicitly says "scrape" → use scrape_website.
+- If the user asks for LinkedIn profile or company LinkedIn → use search_linkedin.
+- DO NOT call search_web unless explicitly required.
 
-Formats:
-
-Search:
-{
-  "action": "search_web",
-  "data": {
-    "query": "<search query>"
-  }
-}
+Tool formats (ONLY if needed):
 
 Scrape website:
 {
@@ -29,22 +24,10 @@ Scrape website:
   }
 }
 
-LinkedIn:
-{
-  "action": "search_linkedin",
-  "data": {
-    "person_name": "<optional>",
-    "company_name": "<company>"
-  }
-}
-
-Rules:
-- If user asks for news, research, info → search_web
-- If user provides a URL or says scrape → scrape_website
-- If user asks about a person/company LinkedIn → search_linkedin
-
-Only JSON. No explanations.
+Otherwise, return a NORMAL TEXT ANSWER.
+Do NOT force JSON unless calling a tool.
 """
+
 
 class ResearcherAgent:
     def __init__(self):

@@ -3,34 +3,29 @@ from langsmith import traceable
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from tavily import TavilyClient
+import requests
+from bs4 import BeautifulSoup
 
 class SearchWebInput(BaseModel):
     query: str = Field(description="The search query string")
 
 @tool("SearchWeb", args_schema=SearchWebInput)
 @traceable(run_type="tool", name="SearchWeb")
-def search_web(query: str, search_type: str = "basic", max_results: int = 5):
-    """ Perform a web search using the Tavily API. """
-    try:
-        client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-        search_response = client.search(query=query, search_depth=search_type, max_results=max_results)
-        results = search_response["results"]
+def search_web(query: str):
+    """
+    Search Wikipedia (no API key).
+    """
+    search_url = f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}"
+    response = requests.get(search_url, timeout=10)
 
-        if not results:
-            return "No results found."
+    if response.status_code != 200:
+        return "No results found."
 
-        formatted_output = ""
-        for result in results:
-            title = result.get('title', result.get('url', 'No Title'))
-            url = result.get('url', 'No URL')
-            content = result.get('content', 'No Content')
+    soup = BeautifulSoup(response.text, "html.parser")
+    paragraphs = soup.find_all("p")
 
-            formatted_output += f"Title: {title}\n"
-            formatted_output += f"URL: {url}\n"
-            formatted_output += f"Content: {content}\n"
-            formatted_output += "-" * 20 + "\n"
+    content = ""
+    for p in paragraphs[:5]:
+        content += p.get_text() + "\n"
 
-        return formatted_output
-
-    except Exception as e:
-        return f"An error occurred: {e}"
+    return content.strip() or "No readable content."

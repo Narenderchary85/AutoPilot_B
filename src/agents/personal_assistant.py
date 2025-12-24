@@ -59,6 +59,14 @@ class PersonalAssistant:
             pass  # Not JSON or no action
 
         return reply_text
+    
+    def direct_llm_response(self, message: str):
+        """
+        Used when no agent is required.
+        Directly ask the LLM to answer the user.
+        """
+        response = self.agent.llm.invoke(message)
+        return response["choices"][0]["message"]["content"]
 
     def invoke(self, message, user_id: str):
         """
@@ -106,9 +114,11 @@ class PersonalAssistant:
             return self.try_execute_action(reply,user_id=user_id)
 
         if agent == "google_news_agent":
-            # Ask the agent to get the JSON action
             reply = self.google_news_agent.invoke(user_message)
             return self.try_execute_action(reply,user_id=user_id)
+        
+        if agent == "none":
+            return self.direct_llm_response(user_message)
 
 
         # No agent needed

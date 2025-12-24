@@ -15,6 +15,7 @@ class PerplexityLLM:
         self.api_key = PPLX_API_KEY
         self.url = "https://api.perplexity.ai/chat/completions"
 
+
     def call_perplexity_api(self, system_prompt, user_message):
         headers = {
             "Authorization": f"Bearer {self.api_key}",
