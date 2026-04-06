@@ -35,4 +35,4 @@ class ContactsAgent:
 
     def invoke(self, message):
         response = self.agent.invoke(message)
-        return response["choices"][0]["message"]["content"]
+        return response["candidates"][0]["content"]["parts"][0]["text"]

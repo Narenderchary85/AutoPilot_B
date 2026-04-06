@@ -69,16 +69,11 @@ async def chat(
         extracted_text = await extract_text_from_file(file)
 
         final_input = f"""
-            User uploaded a file.
-
-            File name: {file.filename}
-
-            File content:
             {extracted_text}
             user message: {message if message else '[No additional message]'}
             """
         user_message_for_logs = f"[FILE] {file.filename}"
-
+        print(final_input)
     else:
         final_input = message
         user_message_for_logs = message

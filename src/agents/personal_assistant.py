@@ -7,6 +7,8 @@ from src.agents.contact_agent import ContactsAgent
 from src.agents.executor import execute_action
 from src.agents.google_news_agent import GoogleNewsAgent
 import json
+from src.core.llm_utils import extract_text
+import re
 
 MANAGER_PROMPT = """
 You are a router.
@@ -51,9 +53,9 @@ class PersonalAssistant:
         }
         """
         try:
-            data = json.loads(reply_text)
+            cleaned = re.sub(r"```json|```", "", reply_text).strip()
+            data = json.loads(cleaned)
             if "action" in data:
-                print("Executing action:", data["action"])
                 return execute_action(data,user_id=user_id)
         except Exception:
             pass  # Not JSON or no action
@@ -66,7 +68,7 @@ class PersonalAssistant:
         Directly ask the LLM to answer the user.
         """
         response = self.agent.llm.invoke(message)
-        return response["choices"][0]["message"]["content"]
+        return extract_text(response)
 
     def invoke(self, message, user_id: str):
         """
@@ -77,15 +79,15 @@ class PersonalAssistant:
         router_output = self.agent.invoke(message)
 
         # Extract Perplexity text
-        raw_text = router_output["choices"][0]["message"]["content"]
+        raw_text = extract_text(router_output)
         
         print("\n--- ROUTER RAW TEXT ---")
         print(raw_text)
         print("-----------------------\n")
-
+        clean_text = raw_text.replace("```json", "").replace("```", "").strip()
         # Parse router JSON
         try:
-            router_json = json.loads(raw_text)
+            router_json = json.loads(clean_text)
         except Exception:
             return {
                 "error": "Router returned invalid JSON",
@@ -97,11 +99,12 @@ class PersonalAssistant:
 
         # Route based on agent
         if agent == "calendar_agent":
+            print('invoke calendar agent',user_message)
             reply = self.calendar_agent.invoke(user_message)
+            print('calendar agent reply',reply)
             return self.try_execute_action(reply,user_id=user_id)
 
         if agent == "email_agent":
-            print('inkove email agent')
             reply = self.email_agent.invoke(user_message)
             return self.try_execute_action(reply,user_id=user_id)
         

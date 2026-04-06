@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from google_auth_oauthlib.flow import Flow
+from fastapi.responses import RedirectResponse
 from src.utils.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from src.db.mongo import google_tokens_collection
 from src.auth.dependencies import get_current_user
@@ -74,4 +75,5 @@ def google_callback(request: Request):
         upsert=True
     )
 
-    return {"message": "Google account connected"}
+    frontend_login_url = "http://localhost:5173"
+    return RedirectResponse(url=frontend_login_url)

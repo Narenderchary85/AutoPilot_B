@@ -2,6 +2,7 @@ import json
 from src.core.llm import PerplexityLLM
 from src.agents.base import Agent
 from src.agents.executor import execute_action
+from src.core.llm_utils import extract_text
 
 CALENDAR_AGENT_PROMPT = """
 You are a Calendar Manager Agent.
@@ -34,4 +35,4 @@ class CalendarAgent:
 
     def invoke(self, message: str):
         response = self.agent.invoke(message)
-        return response["choices"][0]["message"]["content"]
+        return extract_text(response)

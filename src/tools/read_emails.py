@@ -239,15 +239,19 @@ def read_emails(
 
             email_list.append(email_data)
 
-        # -------------------------------
-        # STEP 7: RETURN
-        # -------------------------------
-        print("\n[STEP 7] Returning email list")
-        print("Total emails returned:", len(email_list))
+        formatted_emails = []
 
-        print("========== ReadEmails TOOL END ==========\n")
+        for email in email_list:
+            formatted = f"""
+        From: {email['from']}
+        Subject: {email['subject']}
+        Date: {email['date']}
+        Message: {email['snippet']}
+        -----------------------------
+        """
+            formatted_emails.append(formatted.strip())
 
-        return email_list
+        return formatted_emails
 
     except HttpError as error:
         print("❌ GMAIL API ERROR:", error)

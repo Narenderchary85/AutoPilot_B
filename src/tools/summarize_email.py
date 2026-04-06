@@ -214,7 +214,7 @@ Email Content: {mail.get("snippet")}
 
         try:
             summary_text = (
-                llm_response["choices"][0]["message"]["content"]
+                llm_response["candidates"][0]["content"]["parts"][0]["text"]
                 .strip()
                 .replace("\n", " ")
             )

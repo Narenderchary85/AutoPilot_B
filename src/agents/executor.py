@@ -61,6 +61,7 @@ def execute_action(reply,user_id:str):
             try:
                 cleaned = reply.strip().strip('"')
                 data = json.loads(cleaned)
+                print("aysher cleaned data")
             except Exception:
                 return {
                     "error": "Invalid JSON from agent",
@@ -69,7 +70,6 @@ def execute_action(reply,user_id:str):
 
     action = data.get("action")
     payload = data.get("data") or data.get("parameters") or {}
-
     if not action:
         return {
             "error": "No action provided by agent",
@@ -89,7 +89,7 @@ def execute_action(reply,user_id:str):
             "start_time": start_iso,
             "user_id": user_id   
         })
-
+        print(result)
         return {
             "status": "event_created",
             "details": result
@@ -114,7 +114,7 @@ def execute_action(reply,user_id:str):
 
         if isinstance(recipients, str):
             recipients = [recipients]
-        results = []
+
         for recipient in recipients:
             result = send_email.invoke({
                 "to": recipient,
@@ -122,15 +122,8 @@ def execute_action(reply,user_id:str):
                 "body": body,
                 "user_id": user_id
             })
-            results.append({
-                "to": recipient,
-                "result": result
-            })
-        print("results:",results)
-        return {
-            "status": "emails_sent",
-            "results": results
-        }
+
+        return result
 
 
     elif action == "read_emails":
@@ -142,10 +135,7 @@ def execute_action(reply,user_id:str):
             "user_id": user_id
         })
 
-        return {
-            "status": "emails_fetched",
-            "emails": result
-        }
+        return result
 
 
     elif action == "summarize_emails":
@@ -197,30 +187,16 @@ def execute_action(reply,user_id:str):
         }
     
     elif action == "fetch_news":
-        # Directly define query and max_results without invoking the agent recursively
-        query = "Artificial Intelligence"
-        max_results = 10
-
-        # Initialize your news agent
+        data = payload.get("data", {}) 
+        query = data.get("query", "latest news")
+        max_results = data.get("max_results", 5)
         news_agent = GoogleNewsAgent()
 
-        # Fetch articles directly
         articles = news_agent.fetch_news(query, max_results)
-
-        # Summarize the fetched news
         summary = summarize_news(articles, max_points=7)
 
-        return {
-            "status": "news_fetched_summarized",
-            "query": query,
-            "summary": summary,
-            "articles": articles
-        }
+        return summary
 
-
-    # -----------------------
-    # Unknown action
-    # -----------------------
     return {
         "error": "Unknown action",
         "action": action

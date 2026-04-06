@@ -50,6 +50,13 @@ def send_email(to, subject: str, body: str, user_id: str):
         })
 
     return {
-        "status": "success",
-        "sent": results
+            f"""
+            ## ✅ Email Sent Successfully
+
+            **To:** {recipient}
+
+            Your email has been delivered successfully.
+
+            If you need to send another email, just let me know.
+            """
     }

@@ -1,5 +1,7 @@
 from src.agents.base import Agent
 from src.core.llm import PerplexityLLM
+from src.core.llm_utils import extract_text
+
 
 RESEARCHER_AGENT_PROMPT = """
 You are a Researcher Agent.
@@ -36,5 +38,5 @@ class ResearcherAgent:
 
     def invoke(self, message):
         response = self.agent.invoke(message)
-        return response["choices"][0]["message"]["content"]
+        return extract_text(response)
 

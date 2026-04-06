@@ -148,8 +148,8 @@ def find_common_patterns(tasks):
     if len(tasks) >= 10:
         # Pattern 1: Morning email checks
         morning_emails = sum(1 for t in tasks 
-                           if t.get("agent_type", "").lower().contains("email") 
-                           and 6 <= t["created_at"].hour < 10)
+                            if "email" in t.get("agent_type", "").lower()
+                            and 6 <= t["created_at"].hour < 10)
         if morning_emails >= 3:
             patterns.append({
                 "type": "routine",

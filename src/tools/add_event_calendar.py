@@ -32,7 +32,8 @@ def add_event_to_calendar(
     Creates a Google Calendar event.
     This is a LangChain StructuredTool and MUST be called via `.invoke()`
     """
-
+    print("title:", title)
+    print("description:", description)
     try:
         print("Getting user credentials for user_id:", user_id)
         # creds = get_calendar_credentials()
@@ -58,7 +59,7 @@ def add_event_to_calendar(
             calendarId="primary",
             body=event
         ).execute()
-
+        print("Event created with ID:", created_event.get("id"))
         return {
             "message": "Event created successfully",
             "event_id": created_event.get("id"),
